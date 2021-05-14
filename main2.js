@@ -2,15 +2,15 @@
 (() => {
   // - 入力したTodoタスクの一覧を保持する配列を定義する
   //   - 変数名は `todos` とする
-  const todos = [];
-
   // - HTMLのID値を使って以下のDOM要素を取得する
   //   - テキストボックス(input[type="text"])
   //   - 追加ボタン(button要素)
   //   - Todoリストを一覧表示するul要素
+  todos = [];
+
   const textBox = document.getElementById("input-todo-box");
   const addButton = document.getElementById("add-button");
-  const ulElement = document.getElementById("todo-list");
+  const todoList = document.getElementById("todo-list");
 
   // `pickupTodoFromTextBox関数` を実装する
   // - 実現したい機能
@@ -20,10 +20,12 @@
   //   - 無し
   // - 戻り値
   //   - `input[type="text"]`から取得した文字列を返す
+
   const pickupTodoFromTextBox = () => {
-    const todo = textBox.value;
+    const textValue = textBox.value;
     textBox.value = "";
-    return todo;
+
+    return textValue;
   };
 
   // `validateTodo関数` を実装する
@@ -39,11 +41,11 @@
       throw new Error("何も入力されていません");
     }
 
-    const duplicatedTodos = todos.filter(_todo => {
+    const existingTodo = todos.filter(_todo => {
       return todo === _todo;
     });
 
-    if (duplicatedTodos.length > 0) {
+    if (existingTodo.length > 0) {
       throw new Error("同じ名前のタスクはすでに作成されています");
     }
 
@@ -57,7 +59,6 @@
   //   - todo
   // - 戻り値
   //   - 無し
-
   const addTodo = Todo => {
     todos.push(Todo);
   };
@@ -72,26 +73,26 @@
   //   - 無し
   // - 戻り値
   //   - 無し
-
   const showTodos = () => {
-    while (ulElement.firstChild) {
-      ulElement.removeChild(ulElement.firstChild);
+    // 削除処理
+    while (todoList.firstChild) {
+      todoList.removeChild(todoList.firstChild);
     }
 
-    todos.forEach((todo, index) => {
-      const liElement = document.createElement("li");
+    todos.forEach((element, index) => {
+      const todoElement = document.createElement("li");
+      todoElement.textContent = index + ":" + element;
       const taskNumber = index + 1;
 
-      liElement.textContent = taskNumber + ":" + todo;
-      ulElement.appendChild(liElement);
+      todoList.appendChild(todoElement);
 
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "削除";
-      deleteButton.addEventListener("click", event => {
-        promiseTaskOfDeletingTodo(index);
+      deleteButton.addEventListener("click", error => {
+        promiseTaskOfDeletingTodo();
       });
 
-      liElement.appendChild(deleteButton);
+      todoElement.appendChild(deleteButton);
     });
   };
 
@@ -101,7 +102,7 @@
   // - 引数
   //   - index : 配列から削除したい要素のインデックス番号
   const deleteTodo = index => {
-    todos.splice(index, 1);
+    todos.splice(index,1);
   };
 
   // `promiseTaskOfAddingTodo関数を実装する`
@@ -150,5 +151,7 @@
   };
 
   // 追加ボタンをクリックしたら `promiseTaskOfAddingTodo` を実行する
-  addButton.addEventListener("click", promiseTaskOfAddingTodo);
+  addButton.addEventListener("click", () => {
+    promiseTaskOfAddingTodo();
+  });
 })();
